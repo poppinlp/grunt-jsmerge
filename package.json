@@ -1,0 +1,33 @@
+{
+    "name": "grunt-jsmerge",
+    "version": "0.0.1",
+    "description": "Grunt task to merge import javascript file.",
+    "main": "tasks/jsmerge.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/poppinlp/grunt-jsmerge"
+    },
+    "bugs": {
+        "url": "https://github.com/poppinlp/grunt-jsmerge/issues"
+    },
+    "author": {
+        "name": "PoppinL",
+        "email": "poppinlp@gmail.com",
+        "url": "http://poppinlp.github.io"
+    },
+    "license": "MIT",
+    "readmeFilename": "README.md",
+    "engines": {
+        "node": ">= 0.8.0"
+    },
+    "keywords": [
+        "gruntplugin",
+        "merge",
+        "import",
+        "javascript",
+        "js"
+    ],
+    "dependencies": {
+        "grunt": ">=0.4.5"
+    }
+}
