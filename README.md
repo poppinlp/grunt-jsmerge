@@ -25,8 +25,10 @@ Gruntfile.js:
 grunt.config.init({
     jsmerge: {
         dist: {
-            src: 'test/src',
-            dest: 'test/dest'
+            files: {
+                src: 'test/src',
+                dest: 'test/dest'
+            }
         }
     }
 });
