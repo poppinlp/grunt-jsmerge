@@ -1,5 +1,5 @@
 #grunt-jsmerge
-Grunt task to merge import javascript file except `_filename` and `.filename`.
+Grunt task to merge import javascript file like sass and ignore `_filename` and `.filename`.
 
 To use this plugin with jshint and uglify may be a good idea.
 
@@ -39,3 +39,9 @@ grunt.config.init({
 ```
 grunt test
 ```
+
+###Version
+
+- Ver 0.0.3 Support recurse import file and auto ignore the same file in a file import recurse.
+- Ver 0.0.2 Ignore `_file` and `.file`.
+- Ver 0.0.1 Main.

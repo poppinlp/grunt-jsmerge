@@ -1,5 +1,11 @@
 module.exports = function(grunt) {
     grunt.config.init({
+        jshint: {
+            options: grunt.file.readJSON(__dirname + '/.jshintrc'),
+            www: {
+                src: ['tasks/jsmerge.js']
+            }
+        },
         jsmerge: {
             dist: {
                 files: {
@@ -10,5 +16,6 @@ module.exports = function(grunt) {
         }
     });
     grunt.loadTasks('tasks/');
-    grunt.registerTask('test', ['jsmerge']);
+    grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.registerTask('test', ['jshint', 'jsmerge']);
 };
