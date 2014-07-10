@@ -42,6 +42,7 @@ grunt test
 
 ###Version
 
+- Ver 0.0.4 Bugfix
 - Ver 0.0.3 Support recurse import file and auto ignore the same file in a file import recurse.
 - Ver 0.0.2 Ignore `_file` and `.file`.
 - Ver 0.0.1 Main.

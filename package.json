@@ -1,6 +1,6 @@
 {
     "name": "grunt-jsmerge",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Grunt task to merge import javascript file.",
     "main": "tasks/jsmerge.js",
     "repository": {
