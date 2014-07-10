@@ -8,7 +8,7 @@ module.exports = function (grunt) {
             if (list.hasOwnProperty(item)) {
                 files = list[item].files;
                 grunt.file.recurse(files.src, function (path, root, sub, file) {
-                    if (file[0] === '_' || file[0] === '.' || path[0] === '.') return;
+                    if (file[0] === '_' || file[0] === '.' || path[0] === '.' || (sub && sub[0] === '.')) return;
                     console.log(path);
                     cache = {};
                     text = importFile(path, root, sub, file);
