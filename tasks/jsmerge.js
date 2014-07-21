@@ -19,11 +19,13 @@ module.exports = function (grunt) {
             taskOptions = {},
             task, dep;
 
+        if (config.options) {
+            globalOptions = extend(globalOptions, config.options);
+        }
+        clearCache(globalOptions.cache);
         for (task in config) {
             if (config.hasOwnProperty(task)) {
-                if (task === 'options') {
-                    globalOptions = extend(globalOptions, config[task]);
-                } else {
+                if (task !== 'options') {
                     doTask(config[task]);
                 }
             }
@@ -44,7 +46,6 @@ module.exports = function (grunt) {
                 target = task.files.dest + (sub ? sub : '') + file;
                 result = importFile(path, root, sub, file);
 
-                clearCache(options.cache);
                 grunt.file.write(options.cache + file, result, { encoding: 'utf8' });
                 jshint(options, path, file, target);
             });

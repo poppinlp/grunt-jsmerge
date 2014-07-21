@@ -36,7 +36,7 @@ Destination path
 
 #### cache
 
-Cache path. Default `'node_modules/grunt-jsmerge/.cache'`.
+Cache path. Default `'node_modules/grunt-jsmerge/.cache'`.Recommend to use this in globalOptions.
 
 #### uglify
 
@@ -144,6 +144,8 @@ grunt test
 
 ### History
 
+- Ver 0.0.10
+    - Bugfix
 - Ver 0.0.9
     - Add `sourceRoot`, `warnings`, `mangle` for uglifyoptions
     - Fix globalOptions not work
