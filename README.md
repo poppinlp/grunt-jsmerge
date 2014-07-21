@@ -144,8 +144,8 @@ grunt test
 
 ### History
 
-- Ver 0.0.10
-    - Bugfix
+- Ver 0.0.11 Bugfix
+- Ver 0.0.10 Bugfix
 - Ver 0.0.9
     - Add `sourceRoot`, `warnings`, `mangle` for uglifyoptions
     - Fix globalOptions not work

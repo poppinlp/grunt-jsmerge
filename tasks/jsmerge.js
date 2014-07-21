@@ -17,17 +17,28 @@ module.exports = function (grunt) {
             },
             done = this.async(),
             taskOptions = {},
+            taskQueue = [],
             task, dep;
 
-        if (config.options) {
-            globalOptions = extend(globalOptions, config.options);
-        }
-        clearCache(globalOptions.cache);
         for (task in config) {
             if (config.hasOwnProperty(task)) {
                 if (task !== 'options') {
-                    doTask(config[task]);
+                    taskQueue.push(config[task]);
+                } else {
+                    globalOptions = extend(globalOptions, config.options);
                 }
+            }
+        }
+        clearCache(globalOptions.cache);
+
+        queue();
+
+        function queue () {
+            var t = taskQueue.pop();
+            if (t) {
+                doTask(t);
+            } else {
+                done();
             }
         }
 
@@ -61,7 +72,7 @@ module.exports = function (grunt) {
                     ]
                 }, function (err, std) {
                     if (std.stderr) {
-                        grunt.fail.fatal(std.stder);
+                        grunt.fail.fatal(std.stderr);
                     } else if (std.stdout) {
                             grunt.log.error(std.stdout);
                     } else {
@@ -94,6 +105,7 @@ module.exports = function (grunt) {
             }
             grunt.file.write(target, result.code, { encoding: 'utf8' });
             grunt.log.ok('Jsmerge build ' + path + ' => ' + target + ' successfully.');
+            queue();
         }
 
         function importFile (path, root, sub, file) {
