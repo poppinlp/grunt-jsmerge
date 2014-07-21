@@ -1,17 +1,18 @@
 var uglifyjs = require('uglify-js');
 
 module.exports = function (grunt) {
+grunt.log.write(__dirname);
     grunt.registerTask('jsmerge', 'Import javascript file', function () {
         var config = grunt.config.get('jsmerge'),
             ln = grunt.util.linefeed,
             globalOptions = {
-                cache: './.cache/',
+                cache: __dirname + '/../.cache/',
                 uglify: true,
                 uglifyopt: {
                     sourceMap: false
                 },
                 jshint: true,
-                jshintrc: './config/jshintrc',
+                jshintrc: __dirname + '/../config/jshintrc',
                 newer: true
             },
             done = this.async(),
@@ -87,7 +88,6 @@ module.exports = function (grunt) {
             } else {
                 result.code = grunt.file.read(options.cache + file, { encoding: 'utf8' });
             }
-            console.log(result);
             grunt.file.write(target, result.code, { encoding: 'utf8' });
             grunt.log.ok('Jsmerge build ' + path + ' => ' + target + ' successfully.');
         }

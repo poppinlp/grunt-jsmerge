@@ -141,6 +141,7 @@ grunt test
 
 ### History
 
+- Ver 0.0.7 Bugfix
 - Ver 0.0.6
     - Reconstruction code
     - Built-in jshint
