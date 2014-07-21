@@ -1,18 +1,18 @@
 var uglifyjs = require('uglify-js');
 
 module.exports = function (grunt) {
-grunt.log.write(__dirname);
     grunt.registerTask('jsmerge', 'Import javascript file', function () {
         var config = grunt.config.get('jsmerge'),
             ln = grunt.util.linefeed,
+            cwd = __dirname + '/../',
             globalOptions = {
-                cache: __dirname + '/../.cache/',
+                cache: cwd + '.cache/',
                 uglify: true,
                 uglifyopt: {
                     sourceMap: false
                 },
                 jshint: true,
-                jshintrc: __dirname + '/../config/jshintrc',
+                jshintrc: cwd + 'config/jshintrc',
                 newer: true
             },
             done = this.async(),
@@ -53,7 +53,7 @@ grunt.log.write(__dirname);
         function jshint (options, path, file, target) {
             if (options.jshint) {
                 grunt.util.spawn({
-                    cmd: './node_modules/.bin/jshint',
+                    cmd: cwd + 'node_modules/.bin/jshint',
                     args: [
                         options.cache + file,
                         '--config'
