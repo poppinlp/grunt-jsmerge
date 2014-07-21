@@ -22,7 +22,7 @@ module.exports = function (grunt) {
         for (task in config) {
             if (config.hasOwnProperty(task)) {
                 if (task === 'options') {
-                    globalOptions = config[task];
+                    globalOptions = extend(globalOptions, config[task]);
                 } else {
                     doTask(config[task]);
                 }
@@ -74,13 +74,16 @@ module.exports = function (grunt) {
 
         function uglify (options, path, file, target) {
             var result = {},
-                opt = {};
+                opt = {},
+                swapOpt = options.uglifyopt;
 
             if (options.uglify) {
-                options.uglifyopt = extend(globalOptions.uglifyopt, options.uglifyopt);
-                if (options.uglifyopt.sourceMap) {
+                swapOpt = extend(globalOptions.uglifyopt, options.uglifyopt);
+                if (swapOpt.sourceMap) {
                     opt.outSourceMap = file.slice(0, -2) + 'map';
                 }
+                opt.sourceRoot = swapOpt.sourceRoot;
+                opt.warnings = swapOpt.warnings;
                 result = uglifyjs.minify([options.cache + file], opt);
                 if (options.uglifyopt.sourceMap) {
                     grunt.file.write(target.slice(0, -2) + 'map', result.map, { encoding: 'utf8' });

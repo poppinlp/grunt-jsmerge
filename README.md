@@ -47,6 +47,9 @@ To use uglify or not. Default `true`.
 Options for uglify. Below is list and default value.
 
 - sourceMap : false
+- sourceRoot : ''
+- warnings : false
+- mangle : true
 
 #### jshint
 
@@ -141,6 +144,9 @@ grunt test
 
 ### History
 
+- Ver 0.0.9
+    - Add `sourceRoot`, `warnings`, `mangle` for uglifyoptions
+    - Fix globalOptions not work
 - Ver 0.0.8 Bugfix
 - Ver 0.0.7 Bugfix
 - Ver 0.0.6

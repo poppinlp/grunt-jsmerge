@@ -7,15 +7,18 @@ module.exports = function(grunt) {
             }
         },
         jsmerge: {
+            options: {
+                uglifyopt: {
+                    sourceMap: true,
+                    sourceRoot: '',
+                    warnings: true,
+                    mangle: false
+                }
+            },
             dist: {
                 files: {
                     src: 'test/src/',
                     dest: 'test/dest/'
-                },
-                options: {
-                    uglifyopt: {
-                        sourceMap: true
-                    }
                 }
             }
         }
