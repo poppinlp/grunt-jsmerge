@@ -1,7 +1,7 @@
 {
     "name": "grunt-jsmerge",
-    "version": "0.0.5",
-    "description": "Grunt task to merge import javascript file.",
+    "version": "0.0.6",
+    "description": "Grunt task to import javascript file.",
     "main": "tasks/jsmerge.js",
     "repository": {
         "type": "git",
@@ -25,10 +25,17 @@
         "merge",
         "import",
         "javascript",
-        "js"
+        "js",
+        "combine",
+        "jshint",
+        "uglify"
     ],
     "dependencies": {
-        "grunt": ">=0.4.5",
+        "grunt": ">=0.4.0",
+        "jshint": ">=2.5.2",
+        "uglify-js": ">=2.4.15"
+    },
+    "devDependencies": {
         "grunt-contrib-jshint": ">=0.10.0"
     }
 }

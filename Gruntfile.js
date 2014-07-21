@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
     grunt.config.init({
         jshint: {
-            options: grunt.file.readJSON(__dirname + '/.jshintrc'),
+            options: grunt.file.readJSON(__dirname + '/config/jshintrc'),
             www: {
                 src: ['tasks/jsmerge.js']
             }
@@ -11,6 +11,11 @@ module.exports = function(grunt) {
                 files: {
                     src: 'test/src/',
                     dest: 'test/dest/'
+                },
+                options: {
+                    uglifyopt: {
+                        sourceMap: true
+                    }
                 }
             }
         }

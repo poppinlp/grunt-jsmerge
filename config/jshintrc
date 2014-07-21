@@ -71,5 +71,6 @@
     "white"         : false,
 
     "globals"       : {
+                        "console": true
                       }
 }

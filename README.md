@@ -1,49 +1,152 @@
-#grunt-jsmerge
-Grunt task to merge import javascript file like sass and ignore `_filename` and `.filename`.
+# Grunt-jsmerge
 
-To use this plugin with jshint and uglify may be a good idea.
+Grunt task to import javascript file and ignore `_filename` and `.filename`.
 
-###Example
+### Getting Started
 
-foo.js:
+This plugin requires Grunt >=0.4.0
+
+If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
+
+```shell
+npm install grunt-jsmerge --save-dev
+```
+
+Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
 
 ```js
+grunt.loadNpmTasks('grunt-jsmerge');
+```
+
+### Jsmerge Task
+
+_Run this task with the `grunt jsmerge` command._
+
+Task targets, files and options may be specified according to the grunt [Configuring tasks](http://gruntjs.com/configuring-tasks) guide.
+
+### Options
+
+#### src
+
+Source path
+
+#### dest
+
+Destination path
+
+#### cache
+
+Cache path. Default `'node_modules/grunt-jsmerge/.cache'`.
+
+#### uglify
+
+To use uglify or not. Default `true`.
+
+#### uglifyopt
+
+Options for uglify. Below is list and default value.
+
+- sourceMap : false
+
+#### jshint
+
+To use jshint or not. Default `true`.
+
+#### jshintrc
+
+The `jshintrc` file path. Default `'node_modules/grunt-jsmerge/config/jshintrc'`.
+
+#### newer
+
+Only build changed file and new file. Default `true`.
+
+### Usage Examples
+
+#### Basic
+
+```js
+// foo.js:
 var foo = 1;
 $import '_foobar.js';
 console.log(foo + bar);
 ```
 
-_foobar.js:
-
-```
+```js
+// _foobar.js:
 var bar = 2;
 ```
 
-Gruntfile.js:
-
+```js
+// Project configuration
+grunt.config.init({
+    jsmerge: {
+        dist: {
+            src: 'test/src',
+            dest: 'test/dest'
+        }
+    }
+});
 ```
+
+#### Use options
+
+```js
+// Project configuration
 grunt.config.init({
     jsmerge: {
         dist: {
             files: {
                 src: 'test/src',
                 dest: 'test/dest'
+            },
+            options: {
+                jshint: true,
+                newer: false
             }
         }
     }
 });
 ```
 
-###Demo
+#### Use global options
 
+```js
+// Project configuration
+grunt.config.init({
+    jsmerge: {
+        options: {
+            uglify: true
+        },
+        dist: {
+            files: {
+                src: 'test/src',
+                dest: 'test/dest',
+            },
+            options: {
+                jshint: true,
+                newer: false
+            }
+        }
+    }
+});
 ```
+
+### Demo
+
+Run the demo in module:
+
+```shell
 grunt test
 ```
 
-###Version
+### History
 
+- Ver 0.0.6
+    - Reconstruction code
+    - Built-in jshint
+    - Built-in uglify
 - Ver 0.0.5 Bugfix again
 - Ver 0.0.4 Bugfix
-- Ver 0.0.3 Support recurse import file and auto ignore the same file in a file import recurse.
-- Ver 0.0.2 Ignore `_file` and `.file`.
-- Ver 0.0.1 Main.
+- Ver 0.0.3 Support recurse import file and auto ignore the same file in a file import recurse
+- Ver 0.0.2 Ignore `_file` and `.file`
+- Ver 0.0.1 Main
