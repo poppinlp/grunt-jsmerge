@@ -1,4 +1,5 @@
-var uglifyjs = require('uglify-js');
+var uglifyjs = require('uglify-js'),
+    queue = require('queue');
 
 module.exports = function (grunt) {
     grunt.registerTask('jsmerge', 'Import javascript file', function () {
@@ -15,32 +16,28 @@ module.exports = function (grunt) {
                 jshintrc: cwd + 'config/jshintrc',
                 newer: true
             },
+            taskQueue = queue({
+                timeout: 5000,
+                concurrency: 1
+            }),
             done = this.async(),
             taskOptions = {},
-            taskQueue = [],
             task, dep;
 
         for (task in config) {
             if (config.hasOwnProperty(task)) {
                 if (task !== 'options') {
-                    taskQueue.push(config[task]);
+                    taskQueue.push(function (cb) {
+                        doTask(config[task]);
+                        cb();
+                    });
                 } else {
                     globalOptions = extend(globalOptions, config.options);
                 }
             }
         }
         clearCache(globalOptions.cache);
-
-        queue();
-
-        function queue () {
-            var t = taskQueue.pop();
-            if (t) {
-                doTask(t);
-            } else {
-                done();
-            }
-        }
+        taskQueue.start();
 
         function doTask (task) {
             var target,
@@ -105,7 +102,9 @@ module.exports = function (grunt) {
             }
             grunt.file.write(target, result.code, { encoding: 'utf8' });
             grunt.log.ok('Jsmerge build ' + path + ' => ' + target + ' successfully.');
-            queue();
+            if (!taskQueue.length) {
+                done();
+            }
         }
 
         function importFile (path, root, sub, file) {
