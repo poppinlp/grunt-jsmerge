@@ -24,19 +24,21 @@ module.exports = function (grunt) {
             taskOptions = {},
             task, dep;
 
+        if (config.options) {
+            globalOptions = extend(globalOptions, config.options);
+        }
+        clearCache(globalOptions.cache);
+
         for (task in config) {
             if (config.hasOwnProperty(task)) {
                 if (task !== 'options') {
-                    taskQueue.push(function (cb) {
-                        doTask(config[task]);
-                        cb();
-                    });
-                } else {
-                    globalOptions = extend(globalOptions, config.options);
+                    doTask(config[task]);
                 }
             }
         }
-        clearCache(globalOptions.cache);
+        taskQueue.on('end', function () {
+            done();
+        });
         taskQueue.start();
 
         function doTask (task) {
@@ -44,10 +46,10 @@ module.exports = function (grunt) {
                 options = {},
                 result;
 
-            dep = {};
             grunt.file.recurse(task.files.src, function (path, root, sub, file) {
                 if (file[0] === '_' || file[0] === '.' || path[0] === '.' || (sub && sub[0] === '.')) return;
 
+                dep = {};
                 taskOptions = task.options ? task.options : {};
                 options = extend(options, globalOptions);
                 options = extend(options, taskOptions);
@@ -61,20 +63,23 @@ module.exports = function (grunt) {
 
         function jshint (options, path, file, target) {
             if (options.jshint) {
-                grunt.util.spawn({
-                    cmd: cwd + 'node_modules/.bin/jshint',
-                    args: [
-                        options.cache + file,
-                        '--config'
-                    ]
-                }, function (err, std) {
-                    if (std.stderr) {
-                        grunt.fail.fatal(std.stderr);
-                    } else if (std.stdout) {
-                            grunt.log.error(std.stdout);
-                    } else {
-                        uglify(options, path, file, target);
-                    }
+                taskQueue.push(function (cb) {
+                    grunt.util.spawn({
+                        cmd: cwd + 'node_modules/.bin/jshint',
+                        args: [
+                            options.cache + file,
+                            '--config'
+                        ]
+                    }, function (err, std) {
+                        if (std.stderr) {
+                            grunt.fail.fatal(std.stderr);
+                        } else if (std.stdout) {
+                                grunt.log.error(std.stdout);
+                        } else {
+                            uglify(options, path, file, target);
+                        }
+                        cb();
+                    });
                 });
             } else {
                 uglify(options, path, file, target);
@@ -102,9 +107,6 @@ module.exports = function (grunt) {
             }
             grunt.file.write(target, result.code, { encoding: 'utf8' });
             grunt.log.ok('Jsmerge build ' + path + ' => ' + target + ' successfully.');
-            if (!taskQueue.length) {
-                done();
-            }
         }
 
         function importFile (path, root, sub, file) {

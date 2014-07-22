@@ -144,6 +144,7 @@ grunt test
 
 ### History
 
+- Ver 0.0.13 Bugfix
 - Ver 0.0.12 Bugfix
 - Ver 0.0.11 Bugfix
 - Ver 0.0.10 Bugfix
