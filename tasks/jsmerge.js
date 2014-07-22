@@ -18,16 +18,21 @@ module.exports = function (grunt) {
             },
             taskQueue = queue({
                 timeout: 5000,
-                concurrency: 1
+                concurrency: 4
             }),
             done = this.async(),
             taskOptions = {},
+            success = true,
             task, dep;
 
         if (config.options) {
             globalOptions = extend(globalOptions, config.options);
         }
-        clearCache(globalOptions.cache);
+        // clear cache
+        grunt.file.recurse(globalOptions.cache, function (path, root, sub, file) {
+            if (path[0] === '.') return;
+            grunt.file['delete'](path);
+        });
 
         for (task in config) {
             if (config.hasOwnProperty(task)) {
@@ -37,7 +42,7 @@ module.exports = function (grunt) {
             }
         }
         taskQueue.on('end', function () {
-            done();
+            done(success);
         });
         taskQueue.start();
 
@@ -56,34 +61,35 @@ module.exports = function (grunt) {
                 target = task.files.dest + (sub ? sub : '') + file;
                 result = importFile(path, root, sub, file);
 
+                // write cache
                 grunt.file.write(options.cache + file, result, { encoding: 'utf8' });
-                jshint(options, path, file, target);
-            });
-        }
 
-        function jshint (options, path, file, target) {
-            if (options.jshint) {
-                taskQueue.push(function (cb) {
-                    grunt.util.spawn({
-                        cmd: cwd + 'node_modules/.bin/jshint',
-                        args: [
-                            options.cache + file,
-                            '--config'
-                        ]
-                    }, function (err, std) {
-                        if (std.stderr) {
-                            grunt.fail.fatal(std.stderr);
-                        } else if (std.stdout) {
+                // jshint
+                if (options.jshint) {
+                    taskQueue.push(function (cb) {
+                        grunt.util.spawn({
+                            cmd: cwd + 'node_modules/.bin/jshint',
+                            args: [
+                                options.cache + file,
+                                '--config',
+                                options.jshintrc
+                            ]
+                        }, function (err, std) {
+                            if (std.stderr) {
+                                grunt.fail.fatal(std.stderr);
+                            } else if (std.stdout) {
                                 grunt.log.error(std.stdout);
-                        } else {
-                            uglify(options, path, file, target);
-                        }
-                        cb();
+                                success = false;
+                            } else {
+                                uglify(options, path, file, target);
+                            }
+                            cb();
+                        });
                     });
-                });
-            } else {
-                uglify(options, path, file, target);
-            }
+                } else {
+                    uglify(options, path, file, target);
+                }
+            });
         }
 
         function uglify (options, path, file, target) {
@@ -140,13 +146,6 @@ module.exports = function (grunt) {
                 }
             }
             return self;
-        }
-
-        function clearCache (cache) {
-            grunt.file.recurse(cache, function (path, root, sub, file) {
-                if (path[0] === '.') return;
-                grunt.file['delete'](path);
-            });
         }
     });
 };
