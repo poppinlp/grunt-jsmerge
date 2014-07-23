@@ -150,6 +150,7 @@ grunt test
 
 ### History
 
+- Ver 0.1.0 First stable version
 - Ver 0.0.15
     - Bugfix
     - Add `concurrency`, `newer` option
