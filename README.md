@@ -1,5 +1,7 @@
 # Grunt-jsmerge
 
+[![Build Status](https://travis-ci.org/poppinlp/grunt-jsmerge.png?branch=master)](https://travis-ci.org/poppinlp/grunt-jsmerge)
+
 Grunt task to import javascript file. Ignore `_filename` and `.filename`.
 
 ### Getting Started
