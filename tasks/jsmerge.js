@@ -106,6 +106,9 @@ module.exports = function (grunt) {
                                 grunt.fail.fatal(std.stderr);
                             } else if (std.stdout) {
                                 grunt.log.error(std.stdout);
+                                if (timestamp[path]) {
+                                    delete timestamp[path];
+                                }
                                 success = false;
                             } else {
                                 uglify(options, path, file, target);
