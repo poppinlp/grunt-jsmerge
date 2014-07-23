@@ -1,6 +1,6 @@
 # Grunt-jsmerge
 
-Grunt task to import javascript file and ignore `_filename` and `.filename`.
+Grunt task to import javascript file. Ignore `_filename` and `.filename`.
 
 ### Getting Started
 
@@ -136,7 +136,7 @@ grunt.config.init({
 
 ### Demo
 
-Run the demo in module:
+Run the test demo:
 
 ```shell
 grunt test
