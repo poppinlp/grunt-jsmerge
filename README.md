@@ -109,8 +109,7 @@ grunt.config.init({
                 dest: 'test/dest'
             },
             options: {
-                jshint: true,
-                newer: false
+                jshint: true
             }
         }
     }
@@ -132,8 +131,7 @@ grunt.config.init({
                 dest: 'test/dest',
             },
             options: {
-                jshint: true,
-                newer: false
+                jshint: true
             }
         }
     }

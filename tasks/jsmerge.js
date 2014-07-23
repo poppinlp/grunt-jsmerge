@@ -8,13 +8,12 @@
 
 'use strict';
 
-var uglifyjs = require('uglify-js'),
-    queue = require('queue'),
-    fs = require('fs');
-
 module.exports = function (grunt) {
     grunt.registerTask('jsmerge', 'Import javascript file', function () {
-        var config = grunt.config.get('jsmerge'),
+        var uglifyjs = require('uglify-js'),
+            queue = require('queue'),
+            fs = require('fs'),
+            config = grunt.config.get('jsmerge'),
             ln = grunt.util.linefeed,
             cwd = __dirname + '/../',
             globalOptions = {
