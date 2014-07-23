@@ -1,6 +1,6 @@
 {
     "name": "grunt-jsmerge",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Grunt task to import javascript file.",
     "main": "tasks/jsmerge.js",
     "repository": {
@@ -31,8 +31,7 @@
         "uglify"
     ],
     "scripts": {
-        "test": "grunt test",
-        "preinstall": "npm list -g grunt-cli || npm install -g grunt-cli"
+        "test": "grunt test"
     },
     "dependencies": {
         "grunt": ">=0.4.0",
