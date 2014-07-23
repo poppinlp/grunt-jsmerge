@@ -31,7 +31,8 @@
         "uglify"
     ],
     "scripts": {
-        "test": "grunt test"
+        "test": "grunt test",
+        "preinstall": "npm list -g grunt-cli || npm install -g grunt-cli"
     },
     "dependencies": {
         "grunt": ">=0.4.0",
