@@ -30,11 +30,11 @@ Task targets, files and options may be specified according to the grunt [Configu
 
 #### src
 
-Source path
+Source path.
 
 #### dest
 
-Destination path
+Destination path.
 
 #### cache
 
@@ -148,6 +148,7 @@ grunt test
 
 ### History
 
+- Ver 0.1.3 Some fix
 - Ver 0.1.2 First stable version
 - Ver 0.1.1 Fix timestamp bug
 - Ver 0.1.0 Bugfix

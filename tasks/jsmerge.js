@@ -32,6 +32,9 @@ module.exports = function (grunt) {
             success = true,
             timestampPath = cwd + 'config/timestamp.json',
             timestamp = {},
+            encoding = {
+                encoding: 'utf8'
+            },
             taskQueue,
             task, dep;
 
@@ -49,7 +52,7 @@ module.exports = function (grunt) {
         });
         // read timestamp
         if (globalOptions.newer) {
-            timestamp = JSON.parse(grunt.file.read(timestampPath, { encoding: 'utf8' }));
+            timestamp = JSON.parse(grunt.file.read(timestampPath, encoding));
         }
 
         for (task in config) {
@@ -61,7 +64,7 @@ module.exports = function (grunt) {
         }
         taskQueue.on('end', function () {
             if (globalOptions.newer) {
-                grunt.file.write(timestampPath, JSON.stringify(timestamp), { encoding: 'utf8' });
+                grunt.file.write(timestampPath, JSON.stringify(timestamp), encoding);
             }
             done(success);
         });
@@ -88,7 +91,7 @@ module.exports = function (grunt) {
                 result = importFile(path, root, sub, file);
 
                 // write cache
-                grunt.file.write(options.cache + file, result, { encoding: 'utf8' });
+                grunt.file.write(options.cache + file, result, encoding);
 
                 // jshint
                 if (options.jshint) {
@@ -135,12 +138,12 @@ module.exports = function (grunt) {
                 opt.warnings = swapOpt.warnings;
                 result = uglifyjs.minify([options.cache + file], opt);
                 if (options.uglifyopt.sourceMap) {
-                    grunt.file.write(target.slice(0, -2) + 'map', result.map, { encoding: 'utf8' });
+                    grunt.file.write(target.slice(0, -2) + 'map', result.map, encoding);
                 }
             } else {
-                result.code = grunt.file.read(options.cache + file, { encoding: 'utf8' });
+                result.code = grunt.file.read(options.cache + file, encoding);
             }
-            grunt.file.write(target, result.code, { encoding: 'utf8' });
+            grunt.file.write(target, result.code, encoding);
             grunt.log.ok('Jsmerge build ' + path + ' => ' + target + ' successfully.');
         }
 
@@ -148,7 +151,7 @@ module.exports = function (grunt) {
             var reg = new RegExp('\\$import [\'\"].+[\'\"];' + ln, 'ig'),
                 result, files, len, importName, importPath, i;
 
-            result = grunt.file.read(path, { encoding: 'utf8' });
+            result = grunt.file.read(path, encoding);
             files = result.match(reg);
 
             if (files) {
