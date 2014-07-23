@@ -1,5 +1,16 @@
+/*
+ * grunt-jsmerge
+ * https://github.com/poppinlp/grunt-jsmerge
+ *
+ * Copyright (c) 2014 "PoppinLp" Liang Peng
+ * Licensed under the MIT license.
+ */
+
+'use strict';
+
 var uglifyjs = require('uglify-js'),
-    queue = require('queue');
+    queue = require('queue'),
+    fs = require('fs');
 
 module.exports = function (grunt) {
     grunt.registerTask('jsmerge', 'Import javascript file', function () {
@@ -14,25 +25,33 @@ module.exports = function (grunt) {
                 },
                 jshint: true,
                 jshintrc: cwd + 'config/jshintrc',
-                newer: true
-            },
-            taskQueue = queue({
-                timeout: 5000,
+                newer: true,
                 concurrency: 4
-            }),
+            },
             done = this.async(),
             taskOptions = {},
             success = true,
+            timestampPath = cwd + 'config/timestamp.json',
+            timestamp = {},
+            taskQueue,
             task, dep;
 
         if (config.options) {
             globalOptions = extend(globalOptions, config.options);
         }
+        taskQueue = queue({
+            timeout: 10000,
+            concurrency: globalOptions.concurrency
+        });
         // clear cache
         grunt.file.recurse(globalOptions.cache, function (path, root, sub, file) {
             if (path[0] === '.') return;
             grunt.file['delete'](path);
         });
+        // read timestamp
+        if (globalOptions.newer) {
+            timestamp = JSON.parse(grunt.file.read(timestampPath, { encoding: 'utf8' }));
+        }
 
         for (task in config) {
             if (config.hasOwnProperty(task)) {
@@ -42,6 +61,9 @@ module.exports = function (grunt) {
             }
         }
         taskQueue.on('end', function () {
+            if (globalOptions.newer) {
+                grunt.file.write(timestampPath, JSON.stringify(timestamp), { encoding: 'utf8' });
+            }
             done(success);
         });
         taskQueue.start();
@@ -49,10 +71,15 @@ module.exports = function (grunt) {
         function doTask (task) {
             var target,
                 options = {},
-                result;
+                result,
+                lastChange;
 
             grunt.file.recurse(task.files.src, function (path, root, sub, file) {
                 if (file[0] === '_' || file[0] === '.' || path[0] === '.' || (sub && sub[0] === '.')) return;
+
+                lastChange = fs.statSync(path).mtime.getTime();
+                if (timestamp[path] && timestamp[path] === lastChange) return;
+                timestamp[path] = lastChange;
 
                 dep = {};
                 taskOptions = task.options ? task.options : {};

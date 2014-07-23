@@ -38,7 +38,7 @@ Destination path
 
 #### cache
 
-Cache path. Default `'node_modules/grunt-jsmerge/.cache'`.Recommend to use this in globalOptions.
+Cache path. Default `'node_modules/grunt-jsmerge/.cache'`. Only work in global options.
 
 #### uglify
 
@@ -61,9 +61,13 @@ To use jshint or not. Default `true`.
 
 The `jshintrc` file path. Default `'node_modules/grunt-jsmerge/config/jshintrc'`.
 
+#### concurrency
+
+The max count for build file at the same time. Default `4`. Only work in global options.
+
 #### newer
 
-Only build changed file and new file. Default `true`.
+Only build changed file and new file. Default `true`. Only work in global options.
 
 ### Usage Examples
 
@@ -146,13 +150,17 @@ grunt test
 
 ### History
 
+- Ver 0.0.15
+    - Bugfix
+    - Add `concurrency`, `newer` option
+    - Add travis
 - Ver 0.0.14 Optimize
 - Ver 0.0.13 Bugfix
 - Ver 0.0.12 Bugfix
 - Ver 0.0.11 Bugfix
 - Ver 0.0.10 Bugfix
 - Ver 0.0.9
-    - Add `sourceRoot`, `warnings`, `mangle` for uglifyoptions
+    - Add `sourceRoot`, `warnings`, `mangle` for uglify options
     - Fix globalOptions not work
 - Ver 0.0.8 Bugfix
 - Ver 0.0.7 Bugfix
