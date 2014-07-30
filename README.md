@@ -148,6 +148,7 @@ grunt test
 
 ### History
 
+- Ver 0.1.4 Bugfix
 - Ver 0.1.3 Some fix
 - Ver 0.1.2 First stable version
 - Ver 0.1.1 Fix timestamp bug

@@ -94,33 +94,40 @@ module.exports = function (grunt) {
                 grunt.file.write(options.cache + file, result, encoding);
 
                 // jshint
-                if (options.jshint) {
-                    taskQueue.push(function (cb) {
-                        grunt.util.spawn({
-                            cmd: cwd + 'node_modules/.bin/jshint',
-                            args: [
-                                options.cache + file,
-                                '--config',
-                                options.jshintrc
-                            ]
-                        }, function (err, std) {
-                            if (std.stderr) {
-                                grunt.fail.fatal(std.stderr);
-                            } else if (std.stdout) {
-                                grunt.log.error(std.stdout);
-                                if (timestamp[path]) {
-                                    delete timestamp[path];
+                (function () {
+                    var tmpOptions = options,
+                        tmpPath = path,
+                        tmpFile = file,
+                        tmpTarget = target;
+
+                    if (tmpOptions.jshint) {
+                        taskQueue.push(function (cb) {
+                            grunt.util.spawn({
+                                cmd: cwd + 'node_modules/.bin/jshint',
+                                args: [
+                                    tmpOptions.cache + tmpFile,
+                                    '--config',
+                                    tmpOptions.jshintrc
+                                ]
+                            }, function (err, std) {
+                                if (std.stderr) {
+                                    grunt.fail.fatal(std.stderr);
+                                } else if (std.stdout) {
+                                    grunt.log.error(std.stdout);
+                                    if (timestamp[path]) {
+                                        delete timestamp[path];
+                                    }
+                                    success = false;
+                                } else {
+                                    uglify(tmpOptions, tmpPath, tmpFile, tmpTarget);
                                 }
-                                success = false;
-                            } else {
-                                uglify(options, path, file, target);
-                            }
-                            cb();
+                                cb();
+                            });
                         });
-                    });
-                } else {
-                    uglify(options, path, file, target);
-                }
+                    } else {
+                        uglify(tmpOptions, tmpPath, tmpFile, tmpTarget);
+                    }
+                })();
             });
         }
 
