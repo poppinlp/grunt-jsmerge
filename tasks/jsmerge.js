@@ -17,7 +17,6 @@ module.exports = function (grunt) {
             ln = grunt.util.linefeed,
             cwd = __dirname + '/../',
             globalOptions = {
-                cache: cwd + '.cache/',
                 uglify: true,
                 uglifyopt: {
                     sourceMap: false
@@ -32,103 +31,155 @@ module.exports = function (grunt) {
             success = true,
             timestampPath = cwd + 'config/timestamp.json',
             timestamp = {},
+            defaultTimestamp = {},
+            dependencePath = cwd + 'config/dependence.json',
+            dependence = {},
+            defaultDependence = {
+                have: {},
+                bein: {}
+            },
             encoding = {
                 encoding: 'utf8'
             },
             taskQueue,
-            task, dep;
+            fileQueue = {},
+            task, dep, item;
 
+        // read globaloptions
         if (config.options) {
             globalOptions = extend(globalOptions, config.options);
         }
+        // init taskQueue
         taskQueue = queue({
             timeout: 10000,
             concurrency: globalOptions.concurrency
         });
-        // clear cache
-        grunt.file.recurse(globalOptions.cache, function (path, root, sub, file) {
-            if (path[0] === '.') return;
-            grunt.file['delete'](path);
-        });
         // read timestamp
         if (globalOptions.newer) {
-            timestamp = JSON.parse(grunt.file.read(timestampPath, encoding));
+            try {
+                timestamp = grunt.file.readJSON(timestampPath, encoding);
+            } catch (err) {
+                timestamp = defaultTimestamp;
+            }
+            try {
+                dependence = grunt.file.readJSON(dependencePath, encoding);
+            } catch (err) {
+                dependence = defaultDependence;
+            }
         }
 
         for (task in config) {
             if (config.hasOwnProperty(task)) {
                 if (task !== 'options') {
-                    doTask(config[task]);
+                    grunt.file.recurse(config[task].files.src, collectFile);
                 }
             }
         }
+
         taskQueue.on('end', function () {
             if (globalOptions.newer) {
                 grunt.file.write(timestampPath, JSON.stringify(timestamp), encoding);
+                grunt.file.write(dependencePath, JSON.stringify(dependence), encoding);
             }
             done(success);
         });
+
+        for (item in fileQueue) {
+            if (fileQueue.hasOwnProperty(item)) {
+                doFile(fileQueue[item]);
+            }
+        }
         taskQueue.start();
 
-        function doTask (task) {
-            var target,
-                options = {},
-                result,
-                lastChange;
+        function addFile (path, root, sub, file) {
+            if (fileQueue[path]) return;
+            fileQueue[path] = {
+                path: path,
+                root: root,
+                sub: sub,
+                file: file
+            };
+        }
 
-            grunt.file.recurse(task.files.src, function (path, root, sub, file) {
-                if (file[0] === '_' || file[0] === '.' || path[0] === '.' || (sub && sub[0] === '.')) return;
+        function collectFile (path, root, sub, file, flag) {
+            var item, data, lastChange;
 
-                lastChange = fs.statSync(path).mtime.getTime();
-                if (timestamp[path] && timestamp[path] === lastChange) return;
-                timestamp[path] = lastChange;
+            if (file[0] === '.' || path[0] === '.' || (sub && sub[0] === '.') && flag !== true) return;
 
-                dep = {};
-                taskOptions = task.options ? task.options : {};
-                options = extend(options, globalOptions);
-                options = extend(options, taskOptions);
-                target = task.files.dest + (sub ? sub : '') + file;
-                result = importFile(path, root, sub, file);
+            lastChange = fs.statSync(path).mtime.getTime();
+            if (globalOptions.newer && timestamp[path] && timestamp[path] === lastChange && flag !== true) {
+                return;
+            }
+            timestamp[path] = lastChange;
 
-                // write cache
-                grunt.file.write(options.cache + file, result, encoding);
-
-                // jshint
-                (function () {
-                    var tmpOptions = options,
-                        tmpPath = path,
-                        tmpFile = file,
-                        tmpTarget = target;
-
-                    if (tmpOptions.jshint) {
-                        taskQueue.push(function (cb) {
-                            grunt.util.spawn({
-                                cmd: cwd + 'node_modules/.bin/jshint',
-                                args: [
-                                    tmpOptions.cache + tmpFile,
-                                    '--config',
-                                    tmpOptions.jshintrc
-                                ]
-                            }, function (err, std) {
-                                if (std.stderr) {
-                                    grunt.fail.fatal(std.stderr);
-                                } else if (std.stdout) {
-                                    grunt.log.error(std.stdout);
-                                    if (timestamp[path]) {
-                                        delete timestamp[path];
-                                    }
-                                    success = false;
-                                } else {
-                                    uglify(tmpOptions, tmpPath, tmpFile, tmpTarget);
-                                }
-                                cb();
-                            });
-                        });
-                    } else {
-                        uglify(tmpOptions, tmpPath, tmpFile, tmpTarget);
+            if (file[0] === '_') {
+                if (dependence.bein[path]) {
+                    for (item in dependence.bein[path]) {
+                        if (dependence.bein[path].hasOwnProperty(item)) {
+                            data = dependence.bein[path][item];
+                            collectFile(data.path, data.root, data.sub, data.file, true);
+                        }
                     }
-                })();
-            });
+                }
+            } else {
+                addFile(path, root, sub, file);
+            }
+        }
+
+        function doFile (arg) {
+            var options = {},
+                path = arg.path,
+                root = arg.root,
+                sub = arg.sub,
+                file = arg.file,
+                target,
+                result;
+
+            dep = {};
+            taskOptions = task.options ? task.options : {};
+            options = extend(options, globalOptions);
+            options = extend(options, taskOptions);
+            target = config[task].files.dest + (sub ? sub : '') + file;
+            result = importFile(path, root, sub, file);
+
+            // write source file
+            grunt.file.write(target, result, encoding);
+
+            // jshint
+            (function () {
+                var tmpOptions = options,
+                    tmpPath = path,
+                    tmpFile = file,
+                    tmpTarget = target;
+
+                if (tmpOptions.jshint) {
+                    taskQueue.push(function (cb) {
+                        grunt.util.spawn({
+                            cmd: cwd + 'node_modules/.bin/jshint',
+                            args: [
+                                tmpTarget,
+                                '--config',
+                                tmpOptions.jshintrc
+                            ]
+                        }, function (err, std) {
+                            if (std.stderr) {
+                                grunt.fail.fatal(std.stderr);
+                            } else if (std.stdout) {
+                                grunt.log.error(std.stdout);
+                                if (timestamp[path]) {
+                                    delete timestamp[path];
+                                }
+                                success = false;
+                            } else {
+                                uglify(tmpOptions, tmpPath, tmpFile, tmpTarget);
+                            }
+                            cb();
+                        });
+                    });
+                } else {
+                    uglify(tmpOptions, tmpPath, tmpFile, tmpTarget);
+                }
+            })();
         }
 
         function uglify (options, path, file, target) {
@@ -139,17 +190,18 @@ module.exports = function (grunt) {
             if (options.uglify) {
                 swapOpt = extend(globalOptions.uglifyopt, options.uglifyopt);
                 if (swapOpt.sourceMap) {
-                    opt.outSourceMap = file.slice(0, -2) + 'map';
+                    opt.outSourceMap = file + '.map';
                 }
                 opt.sourceRoot = swapOpt.sourceRoot;
                 opt.warnings = swapOpt.warnings;
-                result = uglifyjs.minify([options.cache + file], opt);
+                result = uglifyjs.minify([target], opt);
                 if (options.uglifyopt.sourceMap) {
-                    grunt.file.write(target.slice(0, -2) + 'map', result.map, encoding);
+                    grunt.file.write(target + '.map', result.map, encoding);
                 }
             } else {
-                result.code = grunt.file.read(options.cache + file, encoding);
+                result.code = grunt.file.read(target, encoding);
             }
+            target = target.slice(0, -2) + 'min.js';
             grunt.file.write(target, result.code, encoding);
             grunt.log.ok('Jsmerge build ' + path + ' => ' + target + ' successfully.');
         }
@@ -161,6 +213,9 @@ module.exports = function (grunt) {
             result = grunt.file.read(path, encoding);
             files = result.match(reg);
 
+            // autoclear the dependence on this file and rebuild it again
+            dependence.have[path] = {};
+
             if (files) {
                 len = files.length;
                 for (i = 0; i < len; i++) {
@@ -169,6 +224,21 @@ module.exports = function (grunt) {
                         importPath = root + (sub ? sub : '') + importName;
                         result = result.replace(files[i], dep[importPath] ? '' : importFile(importPath, root, sub, importName));
                         dep[importPath] = true;
+                        dependence.have[path][importPath] = {
+                            path: path,
+                            root: root,
+                            sub: sub,
+                            file: file
+                        };
+                        if (!dependence.bein[importPath]) {
+                            dependence.bein[importPath] = {};
+                        }
+                        dependence.bein[importPath][path] = {
+                            path: path,
+                            root: root,
+                            sub: sub,
+                            file: file
+                        };
                     } catch (err) {
                         grunt.fail.fatal(path + ln + err);
                     }

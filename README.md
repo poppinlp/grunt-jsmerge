@@ -36,10 +36,6 @@ Source path.
 
 Destination path.
 
-#### cache
-
-Cache path. Default `'node_modules/grunt-jsmerge/.cache'`. Only work in global options.
-
 #### uglify
 
 To use uglify or not. Default `true`.
@@ -148,31 +144,29 @@ grunt test
 
 ### History
 
+- Ver 0.1.5
+    - Remove `cache` config
+    - Remove inside `.cache` directory
+    - Build source file, map file and min file in destination directory
+    - Strong `newer`: Now will build a file when it’s import file changed
+    - Bugfix
 - Ver 0.1.4 Bugfix
-- Ver 0.1.3 Some fix
-- Ver 0.1.2 First stable version
-- Ver 0.1.1 Fix timestamp bug
-- Ver 0.1.0 Bugfix
+- Ver 0.1.0 First stable version
 - Ver 0.0.15
     - Bugfix
     - Add `concurrency`, `newer` option
     - Add travis
 - Ver 0.0.14 Optimize
 - Ver 0.0.13 Bugfix
-- Ver 0.0.12 Bugfix
-- Ver 0.0.11 Bugfix
-- Ver 0.0.10 Bugfix
 - Ver 0.0.9
     - Add `sourceRoot`, `warnings`, `mangle` for uglify options
     - Fix globalOptions not work
 - Ver 0.0.8 Bugfix
-- Ver 0.0.7 Bugfix
 - Ver 0.0.6
     - Reconstruction code
     - Built-in jshint
     - Built-in uglify
-- Ver 0.0.5 Bugfix again
-- Ver 0.0.4 Bugfix
+- Ver 0.0.5 Bugfix
 - Ver 0.0.3 Support recurse import file and auto ignore the same file in a file import recurse
 - Ver 0.0.2 Ignore `_file` and `.file`
 - Ver 0.0.1 Main
